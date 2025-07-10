@@ -1,0 +1,19 @@
+# Système
+.DS_Store
+
+# Dépendances Node.js
+node_modules/
+frontend/node_modules/
+backend/node_modules/
+
+# Build React
+frontend/build/
+
+# Fichiers d'environnement
+.env
+.env.*
+frontend/.env*
+backend/.env*
+
+# Logs
+*.log

@@ -5,7 +5,11 @@ const bookRoutes = require('./routes/book');
 
 const app = express();
 
-mongoose.connect('mongodb+srv://lucdubcom:dLA3aNy78aIBj7Sk@monvieuxgrimoire.lv15ti6.mongodb.net/?retryWrites=true&w=majority&appName=MonVieuxGrimoire',
+require('dotenv').config();
+
+console.log(process.env.MONGODB_URI);
+
+mongoose.connect(process.env.MONGODB_URI,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB Atlas réussie !'))

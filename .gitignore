@@ -17,3 +17,6 @@ backend/.env*
 
 # Logs
 *.log
+
+# Fichiers uploadés
+backend/images/

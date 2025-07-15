@@ -24,22 +24,32 @@ exports.createBook = (req, res, next) => {
 
 exports.addRating = (req, res, next) => {
   Book.findOne({ _id: req.params.id })
-    .then(book => {
+    .then((book) => {
       if (!book) return res.status(404).json({ error: "Livre non trouvé" });
 
-      const alreadyRated = book.ratings.some(rating => rating.userId === req.auth.userId);
-      if (alreadyRated) return res.status(400).json({ error: "Vous avez déjà noté ce livre" });
+      const alreadyRated = book.ratings.some(
+        (rating) => rating.userId === req.auth.userId
+      );
+      if (alreadyRated)
+        return res.status(400).json({ error: "Vous avez déjà noté ce livre" });
 
       const rating = { userId: req.auth.userId, grade: req.body.rating };
+      if (req.body.rating < 0 || req.body.rating > 5)
+        return res
+          .status(400)
+          .json({ error: "La note doit être comprise entre 0 et 5" });
       book.ratings.push(rating);
 
-      book.averageRating = book.ratings.reduce((sum, rating) => sum + rating.grade, 0) / book.ratings.length;
+      book.averageRating =
+        book.ratings.reduce((sum, rating) => sum + rating.grade, 0) /
+        book.ratings.length;
 
-      book.save()
-        .then(updatedBook => res.status(200).json(updatedBook))
-        .catch(error => res.status(400).json({ error }));
+      book
+        .save()
+        .then((updatedBook) => res.status(200).json(updatedBook))
+        .catch((error) => res.status(400).json({ error }));
     })
-    .catch(error => res.status(500).json({ error }));
+    .catch((error) => res.status(500).json({ error }));
 };
 
 exports.getAllBooks = (req, res, next) => {
@@ -52,6 +62,17 @@ exports.getOneBook = (req, res, next) => {
   Book.findOne({ _id: req.params.id })
     .then((book) => res.status(200).json(book))
     .catch((error) => res.status(404).json({ error }));
+};
+
+exports.getBestRating = (req, res, next) => {
+  Book.find()
+    .then((books) => {
+      const bestBooks = books
+        .sort((a, b) => b.averageRating - a.averageRating)
+        .slice(0, 3);
+      res.status(200).json(bestBooks);
+    })
+    .catch((error) => res.status(400).json({ error }));
 };
 
 exports.updateBook = (req, res, next) => {
@@ -68,7 +89,7 @@ exports.updateBook = (req, res, next) => {
   Book.findOne({ _id: req.params.id })
     .then((book) => {
       if (book.userId != req.auth.userId) {
-        res.status(401).json({ message: "Not authorized" });
+        res.status(403).json({ message: "Unauthorized request" });
       } else {
         Book.updateOne({ _id: req.params.id }, { ...bookObject })
           .then(() => res.status(200).json({ message: "Livre modifié!" }))
@@ -81,20 +102,22 @@ exports.updateBook = (req, res, next) => {
 };
 
 exports.deleteBook = (req, res, next) => {
-  Book.findOne({ _id: req.params.id})
-      .then(book => {
-          if (book.userId != req.auth.userId) {
-              res.status(401).json({message: 'Not authorized'});
-          } else {
-              const filename = book.imageUrl.split('/images/')[1];
-              fs.unlink(`images/${filename}`, () => {
-                  Book.deleteOne({_id: req.params.id})
-                      .then(() => { res.status(200).json({message: 'Objet supprimé !'})})
-                      .catch(error => res.status(401).json({ error }));
-              });
-          }
-      })
-      .catch( error => {
-          res.status(500).json({ error });
-      });
+  Book.findOne({ _id: req.params.id })
+    .then((book) => {
+      if (book.userId != req.auth.userId) {
+        res.status(403).json({ message: "Unauthorized request" });
+      } else {
+        const filename = book.imageUrl.split("/images/")[1];
+        fs.unlink(`images/${filename}`, () => {
+          Book.deleteOne({ _id: req.params.id })
+            .then(() => {
+              res.status(200).json({ message: "Objet supprimé !" });
+            })
+            .catch((error) => res.status(401).json({ error }));
+        });
+      }
+    })
+    .catch((error) => {
+      res.status(500).json({ error });
+    });
 };

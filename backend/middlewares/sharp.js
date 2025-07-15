@@ -8,11 +8,7 @@ const MIME_TYPES = {
 };
 
 module.exports = (req, res, next) => {
-  console.log("Sharp middleware exécuté");
-  console.log("req.file:", req.file);
-
   if (req.file) {
-    console.log("Fichier trouvé, optimisation...");
     if (!MIME_TYPES[req.file.mimetype]) {
       return res.status(400).json({ error: "Type de fichier non autorisé" });
     }
@@ -30,7 +26,6 @@ module.exports = (req, res, next) => {
 
     next();
   } else {
-    console.log("Pas de fichier");
     next();
   }
 };

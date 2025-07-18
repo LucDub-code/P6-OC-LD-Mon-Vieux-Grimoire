@@ -4,7 +4,6 @@ const fs = require("fs");
 exports.createBook = (req, res, next) => {
   const bookObject = JSON.parse(req.body.book);
   delete bookObject._id;
-  // delete bookObject._userId;
 
   const book = new Book({
     ...bookObject,
@@ -66,10 +65,9 @@ exports.getOneBook = (req, res, next) => {
 
 exports.getBestRating = (req, res, next) => {
   Book.find()
-    .then((books) => {
-      const bestBooks = books
-        .sort((a, b) => b.averageRating - a.averageRating)
-        .slice(0, 3);
+    .sort({ averageRating: -1 })
+    .limit(3)
+    .then((bestBooks) => {
       res.status(200).json(bestBooks);
     })
     .catch((error) => res.status(400).json({ error }));
@@ -89,12 +87,12 @@ exports.updateBook = (req, res, next) => {
   Book.findOne({ _id: req.params.id })
     .then((book) => {
       if (book.userId != req.auth.userId) {
-        res.status(403).json({ message: "Unauthorized request" });
-      } else {
-        Book.updateOne({ _id: req.params.id }, { ...bookObject })
-          .then(() => res.status(200).json({ message: "Livre modifié!" }))
-          .catch((error) => res.status(401).json({ error }));
+        return res.status(403).json({ message: "Unauthorized request" });
       }
+
+      Book.updateOne({ _id: req.params.id }, { ...bookObject })
+        .then(() => res.status(200).json({ message: "Livre modifié!" }))
+        .catch((error) => res.status(400).json({ error }));
     })
     .catch((error) => {
       res.status(400).json({ error });
@@ -105,17 +103,17 @@ exports.deleteBook = (req, res, next) => {
   Book.findOne({ _id: req.params.id })
     .then((book) => {
       if (book.userId != req.auth.userId) {
-        res.status(403).json({ message: "Unauthorized request" });
-      } else {
-        const filename = book.imageUrl.split("/images/")[1];
-        fs.unlink(`images/${filename}`, () => {
-          Book.deleteOne({ _id: req.params.id })
-            .then(() => {
-              res.status(200).json({ message: "Objet supprimé !" });
-            })
-            .catch((error) => res.status(401).json({ error }));
-        });
+        return res.status(403).json({ message: "Unauthorized request" });
       }
+
+      const filename = book.imageUrl.split("/images/")[1];
+      fs.unlink(`images/${filename}`, () => {
+        Book.deleteOne({ _id: req.params.id })
+          .then(() => {
+            res.status(200).json({ message: "Objet supprimé !" });
+          })
+          .catch((error) => res.status(400).json({ error }));
+      });
     })
     .catch((error) => {
       res.status(500).json({ error });

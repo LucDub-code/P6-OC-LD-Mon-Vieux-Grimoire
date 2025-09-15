@@ -21,7 +21,7 @@ function App() {
     setUser(connectedUser);
   }, [connectedUser]);
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/P6-OC-LD-Mon-Vieux-Grimoire">
       <div>
         <ScrollToTop />
         <Header user={user} setUser={setUser} />

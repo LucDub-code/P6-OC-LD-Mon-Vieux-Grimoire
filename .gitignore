@@ -18,5 +18,5 @@ backend/.env*
 # Logs
 *.log
 
-# Fichiers uploadés
-backend/images/
+# Fichiers uploadés  
+# backend/images/ - Commenté pour permettre le déploiement des images existantes

@@ -47,27 +47,8 @@ mongoose
 
 app.use(express.json());
 
-// Route dédiée pour servir les images avec CORS
-app.get("/images/:filename", (req, res) => {
-  const filename = req.params.filename;
-  const imagePath = path.join(__dirname, "images", filename);
-  
-  // Vérifier si le fichier existe
-  const fs = require('fs');
-  if (!fs.existsSync(imagePath)) {
-    return res.status(404).json({ error: "Image not found" });
-  }
-  
-  // Headers CORS spécifiques pour les images
-  res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET');
-  res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache 1 an
-  
-  // Servir l'image
-  res.sendFile(imagePath);
-});
-
 app.use("/api/books", bookRoutes);
 app.use("/api/auth", userRoutes);
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 module.exports = app;

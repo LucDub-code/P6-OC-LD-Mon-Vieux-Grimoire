@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { displayStars } from '../../../lib/functions';
+import { getImageUrl } from '../../../utils/constants';
 import styles from './BookItem.module.css';
 
 function BookItem({ book, size }) {
@@ -20,7 +21,7 @@ function BookItem({ book, size }) {
   return (
     <Link to={`/livre/${book.id}`} className={styles.BookItem}>
       <article>
-        <img className={styles.BookImage} src={book.imageUrl} alt={`${book.title}, ${book.author} - ${book.year}`} />
+        <img className={styles.BookImage} src={getImageUrl(book.imageUrl)} alt={`${book.title}, ${book.author} - ${book.year}`} />
         <div className={styles.BookInfo}>
           <div className={styles.Rating}>
             {displayStars(book.averageRating)}

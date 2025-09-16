@@ -5,6 +5,7 @@ import * as PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { generateStarsInputs } from '../../../lib/functions';
 import { useFilePreview } from '../../../lib/customHooks';
+import { getImageUrl } from '../../../utils/constants';
 import addFileIMG from '../../../images/add_file.png';
 import styles from './BookForm.module.css';
 import { updateBook, addBook } from '../../../lib/common';
@@ -101,7 +102,7 @@ function BookForm({ book, validate }) {
         <div className={styles.AddImage}>
           {filePreview || book?.imageUrl ? (
             <>
-              <img src={filePreview ?? book?.imageUrl} alt="preview" />
+              <img src={filePreview ?? getImageUrl(book?.imageUrl)} alt="preview" />
               <p>Modifier</p>
             </>
           ) : (

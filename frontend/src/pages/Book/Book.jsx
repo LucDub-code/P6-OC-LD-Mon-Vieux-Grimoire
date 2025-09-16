@@ -5,6 +5,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useUser } from '../../lib/customHooks';
 import styles from './Book.module.css';
 import { getBook, deleteBook } from '../../lib/common';
+import { getImageUrl } from '../../utils/constants';
 import BookInfo from '../../components/Books/BookInfo/BookInfo';
 import BookRatingForm from '../../components/Books/BookRatingForm/BookRatingForm';
 import BookDeleteImage from '../../images/book_delete.png';
@@ -66,7 +67,7 @@ function Book() {
   const bookContent = !loading && !book.delete ? (
     <div>
       <div className={styles.Book}>
-        <div className={styles.BookImage} style={{ backgroundImage: `url("${book.imageUrl}")` }} />
+        <div className={styles.BookImage} style={{ backgroundImage: `url("${getImageUrl(book.imageUrl)}")` }} />
         <div className={styles.BookContent}>
           {book?.userId === connectedUser?.userId ? (
             <div className={styles.Owner}>
